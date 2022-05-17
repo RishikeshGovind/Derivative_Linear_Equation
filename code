@@ -1,0 +1,97 @@
+**Derivative Linear Equation Stock Data**
+
+!pip install yfinance --upgrade --no-cache-dir
+
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+import warnings
+warnings.filterwarnings("ignore") 
+
+# yfinance is used to fetch data 
+import yfinance as yf
+yf.pdr_override()
+
+# input
+symbol = 'AMD'
+start = '2021-01-01'
+end = '2022-01-01'
+
+# Read data 
+dataset = yf.download(symbol,start,end)['Adj Close']
+
+# View Columns
+dataset.head()
+
+df = dataset.reset_index()
+
+df.head()
+
+df.tail()
+
+max_p = df['Adj Close'].max()
+min_p = df['Adj Close'].min()
+avg_p = df['Adj Close'].mean()
+
+data = df.drop(['Date'], axis=1)
+data
+
+data = data.reset_index()
+
+data.values
+
+from numpy import ones,vstack
+from numpy.linalg import lstsq
+
+points = data.values
+
+x_coords, y_coords = zip(*points)
+A = vstack([x_coords,ones(len(x_coords))]).T
+m, c = lstsq(A, y_coords)[0]
+
+print("Line Equation is y = {m}x + {c}".format(m=m,c=c))
+
+equation_of_line = print("y = {m}x + {c}".format(m=m,c=c))
+
+plt.figure(figsize=(16,8))
+plt.plot(dataset)
+plt.title('Line of Equation', equation_of_line)
+plt.xlabel('x', color='#1C2833')
+plt.ylabel('y', color='#1C2833')
+plt.legend(loc='best')
+plt.grid()
+plt.show()
+
+from sympy import *
+
+x = Symbol('x')
+
+y = 0.2627878691460382*x + 68.16599544652232
+
+yder = y.diff(x)
+yder
+
+y = 0.2627878691460382*(df.index) + 68.16599544652232
+y
+
+pd.DataFrame(y, columns=['Forecast'])
+dataset
+
+forecast = pd.DataFrame(y, columns=['Forecast'])
+forecast
+
+df = dataset.reset_index()
+df = df.join(forecast)
+df
+
+plt.figure(figsize=(16,8))
+plt.plot(df.Date, df['Adj Close'])
+plt.plot(df.Date, df['Forecast'])
+plt.title('Line of Equation', equation_of_line)
+plt.xlabel('Date', color='#1C2833')
+plt.ylabel('Price', color='#1C2833')
+plt.legend(loc='best')
+plt.grid()
+plt.show()
